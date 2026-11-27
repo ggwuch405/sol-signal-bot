@@ -4,86 +4,93 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#101827">
-  <meta name="description" content="Личная панель анализа SOLUSDT: цена, EMA и RSI.">
+  <meta name="description" content="Информационная панель анализа SOL и HYPE: минутные свечи, EMA, RSI и свечные модели.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg">
-  <title>SOL Signal</title>
+  <title>Market Signal</title>
   <style>
-    :root { color-scheme: dark; --bg:#0b1220; --panel:#121e30; --panel2:#1a2940; --muted:#9aabc2; --line:#2a3a52; --text:#f4f7fb; --green:#42d392; --red:#ff7777; --yellow:#f4c76b; }
+    :root { color-scheme: dark; --bg:#0b1220; --panel:#121e30; --muted:#9aabc2; --line:#2a3a52; --text:#f4f7fb; --green:#42d392; --red:#ff7777; --yellow:#f4c76b; }
     * { box-sizing:border-box }
     body { margin:0; background:radial-gradient(ellipse at top,#172942 0%,var(--bg) 55%); color:var(--text); font:16px system-ui,-apple-system,Segoe UI,sans-serif; min-height:100vh; }
-    main { width:min(720px,100%); margin:auto; padding:22px 16px calc(28px + env(safe-area-inset-bottom)); }
-    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px; }
+    main { width:min(760px,100%); margin:auto; padding:22px 16px calc(28px + env(safe-area-inset-bottom)); }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
     .brand { display:flex; align-items:center; gap:11px; font-weight:800; letter-spacing:.06em; }
     .logo { width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#2c8cff,#7b61ff);display:grid;place-items:center;font-weight:900;font-size:19px; }
     .pill { font-size:12px;color:#a9bad0;border:1px solid var(--line);border-radius:999px;padding:7px 10px; }
-    .card { background:linear-gradient(160deg,rgba(26,41,64,.96),rgba(17,29,46,.96)); border:1px solid var(--line); border-radius:20px; padding:18px; margin-bottom:14px; box-shadow:0 12px 32px rgba(0,0,0,.16); }
-    .muted { color:var(--muted); }
-    .small { font-size:12px; }
-    .price { font-size:clamp(34px,9vw,52px);font-weight:800;letter-spacing:-.04em;margin:4px 0; }
+    .card { background:linear-gradient(160deg,rgba(26,41,64,.96),rgba(17,29,46,.96)); border:1px solid var(--line); border-radius:20px; padding:17px; margin-bottom:14px; box-shadow:0 12px 32px rgba(0,0,0,.16); }
+    .muted { color:var(--muted); } .small { font-size:12px; }
+    .price { font-size:clamp(32px,8vw,46px);font-weight:800;letter-spacing:-.04em;margin:4px 0; }
     .subrow { display:flex;justify-content:space-between;align-items:center;gap:12px; }
-    .grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
-    .metric { background:rgba(8,17,30,.35);border:1px solid rgba(120,150,190,.13);border-radius:15px;padding:14px;min-width:0; }
-    .metric .value { font-size:22px;font-weight:750;margin-top:7px;overflow-wrap:anywhere; }
+    .grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px; }
+    .metric { background:rgba(8,17,30,.35);border:1px solid rgba(120,150,190,.13);border-radius:14px;padding:12px;min-width:0; }
+    .metric .value { font-size:19px;font-weight:750;margin-top:6px;overflow-wrap:anywhere; }
     .signal { display:flex;align-items:center;justify-content:space-between;gap:12px; }
-    .signal-value { font-size:25px;font-weight:850;letter-spacing:.02em; }
-    .tag { border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;background:#25364d;color:#d4dfed; }
+    .signal-value { font-size:24px;font-weight:850;letter-spacing:.02em; }
+    .tag { border-radius:999px;padding:7px 10px;font-size:11px;font-weight:700;background:#25364d;color:#d4dfed; }
     .up { color:var(--green) } .down { color:var(--red) } .neutral { color:var(--yellow) }
     button { border:0;border-radius:13px;background:#347ff0;color:white;font:700 15px inherit;padding:13px 17px;cursor:pointer;min-height:46px; }
     button:disabled { opacity:.55;cursor:wait }
     .error { color:#ffaaaa;background:rgba(120,30,30,.2);border:1px solid rgba(255,120,120,.25);padding:12px;border-radius:12px;display:none;margin-bottom:12px; }
-    .bar { height:8px;background:#26364b;border-radius:99px;overflow:hidden;margin-top:10px; }
+    .bar { height:8px;background:#26364b;border-radius:99px;overflow:hidden;margin-top:9px; }
     .bar > div { height:100%;width:0;background:linear-gradient(90deg,#ff7777,#f4c76b,#42d392);border-radius:99px; }
+    .coin-title {font-weight:800;font-size:15px;letter-spacing:.04em}
     footer { color:var(--muted);font-size:12px;line-height:1.55;padding:8px 3px 0; }
-    @media(min-width:560px){ main{padding-top:32px}.card{padding:22px} }
+    @media(min-width:560px){ main{padding-top:30px}.card{padding:20px} }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <div class="brand"><div class="logo">S</div><div>SOL SIGNAL<div class="muted small" style="font-weight:500;letter-spacing:0">Личная панель рынка</div></div></div>
+    <div class="brand"><div class="logo">M</div><div>MARKET SIGNAL<div class="muted small" style="font-weight:500;letter-spacing:0">Информационная панель рынка</div></div></div>
     <div class="pill" id="connection">ПОДКЛЮЧЕНИЕ…</div>
   </header>
-
   <div class="error" id="error" role="alert"></div>
 
-  <section class="card">
-    <div class="subrow">
-      <div class="muted small">SOL / USDT · Bybit Spot</div>
-      <div class="muted small">5 минут</div>
+  <section class="card" id="sol-card">
+    <div class="subrow"><div class="coin-title">SOL / USDT</div><div class="muted small">Bybit Spot · свечи 1 мин</div></div>
+    <div class="price" id="sol-price">—</div>
+    <div class="subrow"><span class="muted small">Последняя закрытая свеча</span><span class="muted small" id="sol-candle-time">—</span></div>
+    <div class="grid">
+      <div class="metric"><div class="muted small">EMA 9</div><div class="value" id="sol-ema-fast">—</div></div>
+      <div class="metric"><div class="muted small">EMA 21</div><div class="value" id="sol-ema-slow">—</div></div>
+      <div class="metric"><div class="muted small">RSI (14)</div><div class="value" id="sol-rsi">—</div><div class="bar"><div id="sol-rsi-bar"></div></div></div>
+      <div class="metric"><div class="muted small">Объём свечи</div><div class="value" id="sol-volume">—</div></div>
     </div>
-    <div class="price" id="price">—</div>
-    <div class="subrow">
-      <span class="muted small">Последняя закрытая свеча</span>
-      <span class="muted small" id="candle-time">—</span>
+    <div class="card" style="margin:14px 0 0;padding:14px;background:rgba(8,17,30,.28)">
+      <div class="muted small" style="margin-bottom:9px">АНАЛИЗ НАПРАВЛЕНИЯ</div>
+      <div class="signal"><div><div class="muted small">Оценка направления</div><div class="signal-value neutral" id="sol-direction">ОЖИДАНИЕ</div></div><div class="tag" id="sol-ema-state">EMA —</div></div>
+      <p class="muted small" id="sol-explanation" style="margin:10px 0">Загружаем данные…</p>
+      <div class="subrow"><span class="muted small">Свечная модель</span><span class="small" id="sol-pattern">—</span></div>
+      <div class="subrow" style="margin-top:7px"><span class="muted small">Актуальность оценки</span><span class="small" id="sol-valid">—</span></div>
     </div>
   </section>
 
-  <section class="grid">
-    <div class="metric"><div class="muted small">EMA 9</div><div class="value" id="ema-fast">—</div></div>
-    <div class="metric"><div class="muted small">EMA 21</div><div class="value" id="ema-slow">—</div></div>
-    <div class="metric"><div class="muted small">RSI (14)</div><div class="value" id="rsi">—</div><div class="bar"><div id="rsi-bar"></div></div></div>
-    <div class="metric"><div class="muted small">Объём последней свечи</div><div class="value" id="volume">—</div></div>
-  </section>
-
-  <section class="card" style="margin-top:14px">
-    <div class="muted small" style="margin-bottom:10px">СОСТОЯНИЕ ИНДИКАТОРОВ</div>
-    <div class="signal">
-      <div><div class="muted small">Направление</div><div class="signal-value neutral" id="direction">ОЖИДАНИЕ</div></div>
-      <div class="tag" id="ema-state">EMA —</div>
+  <section class="card" id="hype-card">
+    <div class="subrow"><div class="coin-title">HYPE / USDT</div><div class="muted small">Bybit Spot · свечи 1 мин</div></div>
+    <div class="price" id="hype-price">—</div>
+    <div class="subrow"><span class="muted small">Последняя закрытая свеча</span><span class="muted small" id="hype-candle-time">—</span></div>
+    <div class="grid">
+      <div class="metric"><div class="muted small">EMA 9</div><div class="value" id="hype-ema-fast">—</div></div>
+      <div class="metric"><div class="muted small">EMA 21</div><div class="value" id="hype-ema-slow">—</div></div>
+      <div class="metric"><div class="muted small">RSI (14)</div><div class="value" id="hype-rsi">—</div><div class="bar"><div id="hype-rsi-bar"></div></div></div>
+      <div class="metric"><div class="muted small">Объём свечи</div><div class="value" id="hype-volume">—</div></div>
     </div>
-    <p class="muted small" id="explanation" style="margin:12px 0 0">Загружаем рыночные данные…</p>
+    <div class="card" style="margin:14px 0 0;padding:14px;background:rgba(8,17,30,.28)">
+      <div class="muted small" style="margin-bottom:9px">АНАЛИЗ НАПРАВЛЕНИЯ</div>
+      <div class="signal"><div><div class="muted small">Оценка направления</div><div class="signal-value neutral" id="hype-direction">ОЖИДАНИЕ</div></div><div class="tag" id="hype-ema-state">EMA —</div></div>
+      <p class="muted small" id="hype-explanation" style="margin:10px 0">Загружаем данные…</p>
+      <div class="subrow"><span class="muted small">Свечная модель</span><span class="small" id="hype-pattern">—</span></div>
+      <div class="subrow" style="margin-top:7px"><span class="muted small">Актуальность оценки</span><span class="small" id="hype-valid">—</span></div>
+    </div>
   </section>
 
   <section class="subrow" style="margin:18px 2px">
     <div class="muted small" id="updated">Обновление ещё не выполнялось</div>
     <button id="refresh">Обновить</button>
   </section>
-
   <footer>
-    Данные загружаются из публичного API Bybit при открытии приложения и при ручном обновлении. Пока приложение открыто, данные обновляются примерно раз в 30 секунд. В фоне расчёты не выполняются — при следующем открытии данные загрузятся заново.<br><br>
-    Это информационная панель индикаторов, а не торговая рекомендация и не гарантия движения цены.
+    Данные загружаются из публичного API Bybit Spot. Расчёт выполняется по последним закрытым минутным свечам; экран обновляется примерно раз в минуту. «Актуально до» означает время следующей закрытой свечи, после которой оценка может измениться.
+    <br><br>Свечные модели и индикаторы описывают прошлое движение цены и не позволяют достоверно предсказать будущее. Это информационная панель, не торговая рекомендация.
   </footer>
 </main>
 <script src="./app.js"></script>
